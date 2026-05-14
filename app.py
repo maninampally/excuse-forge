@@ -40,3 +40,26 @@ CHAOS_BOOST = {
     "Unhinged":      "Escalate the drama by 3x. Add unnecessary details.",
     "Maximum Chaos": "Go completely off the rails. This is the most dramatic excuse ever written in human history. Pull no punches.",
 }
+
+# ── UI ────────────────────────────────────────────────────────────────────────
+
+st.title("🎭 AI Excuse Generator")
+st.caption("Build absurd alibis. Beat accountability.")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    situation = st.selectbox("What happened?", list(SITUATIONS.keys()))
+    victim = st.text_input("Who are you sending this to?", placeholder="My boss, my partner, my mom...")
+
+with col2:
+    tone_name = st.selectbox("Tone", list(TONES.keys()))
+    doc_type_label = st.selectbox("Document type", list(DOC_TYPES.keys()))
+
+intensity = st.select_slider(
+    "Chaos level",
+    options=["Mild", "Unhinged", "Maximum Chaos"],
+    value="Unhinged",
+)
+
+generate_btn = st.button("🚀 Generate Excuse + Receipt", type="primary", use_container_width=True)
