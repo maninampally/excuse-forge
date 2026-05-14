@@ -144,6 +144,53 @@ Format: SCORE: X/10 | VERDICT: [one savage sentence]"""
     return response.content[0].text
 
 
+# ── CSS ───────────────────────────────────────────────────────────────────────
+
+st.markdown("""
+<style>
+    .stApp { background-color: #0a0a0a; color: #f0f0f0; }
+    .excuse-box {
+        background: #1a0a0a;
+        border: 2px solid #c0392b;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 16px 0;
+        font-style: italic;
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+    .doc-box {
+        background: white;
+        color: black;
+        font-family: 'Courier New', monospace;
+        padding: 32px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        line-height: 1.8;
+    }
+    .stamp {
+        display: inline-block;
+        border: 4px solid red;
+        color: red;
+        font-weight: 900;
+        font-size: 1.1rem;
+        padding: 6px 14px;
+        transform: rotate(-8deg);
+        opacity: 0.7;
+        letter-spacing: 0.2em;
+        margin-top: 16px;
+    }
+    .roast-box {
+        background: #1a0505;
+        border-left: 4px solid #c0392b;
+        padding: 16px;
+        border-radius: 4px;
+        color: #ff6b6b;
+        font-weight: 500;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # ── UI ────────────────────────────────────────────────────────────────────────
 
 st.title("🎭 AI Excuse Generator")
@@ -188,11 +235,21 @@ if generate_btn:
         roast_text = generate_roast(client, situation, excuse_text, tone_name)
 
     st.divider()
-    st.subheader("Your Excuse")
-    st.write(f'"{excuse_text}"')
 
-    st.subheader(f"Official Document")
-    st.code(doc_content)
+    st.subheader("Your Excuse")
+    st.markdown(f'<div class="excuse-box">"{excuse_text}"</div>', unsafe_allow_html=True)
+
+    st.subheader(f"Official {doc_type_label.split(' ', 1)[1]} Document")
+    doc_lines = doc_content.strip().split("\n")
+    doc_html = "<br>".join(
+        f'<strong>{line.split(":", 1)[0]}:</strong>{line.split(":", 1)[1]}'
+        if ":" in line else line
+        for line in doc_lines if line.strip()
+    )
+    st.markdown(
+        f'<div class="doc-box">{doc_html}<br><br><div class="stamp">CERTIFIED</div></div>',
+        unsafe_allow_html=True,
+    )
 
     st.subheader("AI Judge's Verdict")
-    st.error(roast_text)
+    st.markdown(f'<div class="roast-box">{roast_text}</div>', unsafe_allow_html=True)
