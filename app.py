@@ -196,6 +196,19 @@ st.markdown("""
 st.title("🎭 AI Excuse Generator")
 st.caption("Build absurd alibis. Beat accountability.")
 
+with st.sidebar:
+    st.header("How to use")
+    st.markdown("""
+1. **Pick your crime** — select what you did (or didn't do)
+2. **Name the victim** — who's receiving this masterpiece
+3. **Choose your tone** — from Professional to Baby Talk
+4. **Select document type** — your official forgery format
+5. **Set chaos level** — Mild to Maximum Chaos
+6. **Hit Generate** — watch Claude cook
+    """)
+    st.divider()
+    st.caption("Requires an Anthropic API key in `.streamlit/secrets.toml`.")
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -216,23 +229,28 @@ generate_btn = st.button("🚀 Generate Excuse + Receipt", type="primary", use_c
 
 if generate_btn:
     if not victim:
-        st.error("Enter who you're sending this to.")
+        st.error("⚠️ Enter who you're sending this to.")
         st.stop()
 
     client = get_client()
     doc_type = DOC_TYPES[doc_type_label]
     tone_instruction = TONES[tone_name] + " " + CHAOS_BOOST[intensity]
 
-    with st.spinner("Crafting your excuse..."):
-        excuse_text = generate_excuse(client, situation, victim, tone_name, tone_instruction)
-        time.sleep(0.3)
+    try:
+        with st.spinner("Crafting your excuse..."):
+            excuse_text = generate_excuse(client, situation, victim, tone_name, tone_instruction)
+            time.sleep(0.3)
 
-    with st.spinner("Forging your document..."):
-        doc_content = generate_document(client, situation, victim, excuse_text, doc_type)
-        time.sleep(0.3)
+        with st.spinner("Forging your document..."):
+            doc_content = generate_document(client, situation, victim, excuse_text, doc_type)
+            time.sleep(0.3)
 
-    with st.spinner("AI judge is reviewing..."):
-        roast_text = generate_roast(client, situation, excuse_text, tone_name)
+        with st.spinner("AI judge is reviewing..."):
+            roast_text = generate_roast(client, situation, excuse_text, tone_name)
+
+    except Exception as e:
+        st.error(f"⚠️ Generation failed: {e}")
+        st.stop()
 
     st.divider()
 
@@ -253,3 +271,6 @@ if generate_btn:
 
     st.subheader("AI Judge's Verdict")
     st.markdown(f'<div class="roast-box">{roast_text}</div>', unsafe_allow_html=True)
+
+    st.success("✅ Excuse successfully fabricated. You're welcome.")
+    st.balloons()
